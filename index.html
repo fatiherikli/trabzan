@@ -3,6 +3,11 @@
 <head>
   <title>TRABZAN</title>
   <meta charset="utf-8"/>
+  <style type="text/css">
+    canvas {
+      image-rendering: pixelated;
+    }
+  </style>
 </head>
 <body>
 <canvas width="500" height="500" id='game'></canvas>
@@ -16,8 +21,11 @@
   const HALF = SCREEN_SIZE / 2;
   const HORIZON = ['rect', 0, HALF, SCREEN_SIZE, 2, 'black'];
 
+  const THE_SUN = [
+    ['circle', 0, 0, 40, 40, 'white'],
+  ];
+
   const BACKGROUND = [
-    ['circle', 10, 10, 100, 100, 'white'],
     ['rect', 0, 0, SCREEN_SIZE, SCREEN_SIZE, 'gray'],
     ['rect', 0, 0, SCREEN_SIZE, SCREEN_SIZE / 2, 'blue'],
     HORIZON,
@@ -95,6 +103,7 @@
 
   let state = {
     carPosition: 0.1,
+    tick: 0,
     pressedButtons: {
       left: false,
       right: false,
@@ -109,16 +118,28 @@
   function renderObject([type, x1, y1, x2, y2, color,...rest]) {
     switch (type) {
       case 'rect':
+        // context.beginPath();
         context.fillStyle = color;
         context.fillRect(x1, y1, x2, y2);
+        // context.closePath();
         break;
       case 'line': 
         context.lineWidth = 1.5;
         context.strokeStyle = color;
         context.beginPath();
+        context.strokeStyle = color;
         context.moveTo(x1, y1);
         context.lineTo(x2, y2);
         context.stroke();
+        // context.closePath();
+        break;
+      case 'circle':
+        context.beginPath();
+        context.arc(x1, y1, (x2 + y2) / 2, 0, Math.PI * 2, true);
+        context.fillStyle = color;
+        context.fill();
+        // context.closePath();
+        break;
     }
   }
 
@@ -146,11 +167,12 @@
 
     state = {
       ...state,
+      tick: state.tick + 0.1,
       carPosition: newPosition,
       scene: [
-        [BACKGROUND, 0, 0],
-        [BACKGROUND, Math.random() * 2, Math.random() * 2],
-        [CAR, newPosition, Math.random() * 2],
+        [BACKGROUND, Math.random() * 5, Math.random() * 5],
+        [CAR, newPosition, Math.random() * 5],
+        [THE_SUN, 100 + state.tick % SCREEN_SIZE, 80 + Math.random() * 3],
       ],
     };
   }
